@@ -1,22 +1,23 @@
-#include "C:\Users\user\Desktop\Dossier_vscode\C++\c++\projet_c++_basique\barrier_option_h.hpp"
+#include "barrier_option_h.hpp"
 
 class BarrierPricer {
 
     private :
 
-    std::string m_type, m_inout, m_updown;
-    unsigned int M, N, T;
-    double sigma, K, R, S0, m_barrier_value;
+    std::string m_type, m_inout, m_updown; // Call or Put / Knock-in or Knock-out / Up or Down
+    unsigned int M, N, T; // number of path / number of observation's date / maturity
+    double sigma, K, R, S0, m_barrier_value; // volatility / strike / risk-free interest rate / spot / barrier's price
     double sumPayoff = 0.0;
     double option_price = 0.0;
 
     public :
 
+    // Builder
     BarrierPricer(const std::string type, const std::string inout, const std::string updown, const unsigned int nombre_trajectoire, const unsigned int date_observation, const double vol, const double prix_sj_init, const double barrier_value, const double strike, const double taux_r, const unsigned int maturite)
     : m_type(type), m_inout(inout), m_updown(updown), M(nombre_trajectoire), N(date_observation), sigma(vol), S0(prix_sj_init), m_barrier_value(barrier_value), K(strike), R(taux_r), T(maturite) {}
 
 
-    double générateur_loi_normale() { // loi normale -> moyenne de 0 et écart-type de 1
+    double générateur_loi_normale() { 
         static thread_local std::mt19937 gen(std::random_device{}());
         std::normal_distribution<double> dist(0.0, 1.0);
         return dist(gen);
@@ -46,7 +47,7 @@ class BarrierPricer {
                 
             }
 
-            if (m_inout == "in") { // knock-in
+            if (m_inout == "in") { 
                 if (state == 1) { // la barrière a été passée
                     if (m_type == "call") { 
                         sumPayoff += std::max(prix_sj_local - K, 0.0);
@@ -68,7 +69,6 @@ class BarrierPricer {
             }
             state = 0;
         }
-        std::cout << "payoff sum : " << sumPayoff;
         option_price = sumPayoff / static_cast<double>(M);
         option_price *= exp(-R * T);
         return option_price;
@@ -76,7 +76,7 @@ class BarrierPricer {
 
 
     void user_finish() {
-        std::cout << "------------- End Barrier Option Pricer -------------" << std::endl;
+        std::cout << "\n------------- End Barrier Option Pricer -------------" << std::endl;
         std::cout << "Estimation de la valeur de l'option : " << option_price;
     }
 };
