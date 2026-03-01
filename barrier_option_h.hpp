@@ -5,5 +5,7 @@
 #include <string>
 #include <chrono>
 #include <random>
+#include <thread>
+#include <mutex>
 
 #endif // BARRIER_OPTION_H
